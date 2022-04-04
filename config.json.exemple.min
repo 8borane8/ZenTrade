@@ -1,0 +1,18 @@
+{
+    "apiKey": "API_KEY",
+    "secret": "SECRET_KEY",
+    "sub_account": null,
+    
+    "symbol": "BTC/USDT",
+    "amount": 0.01,
+
+    "EMA1_window": 9,
+    "EMA2_window": 38,
+    "STOCH_RSI": 0.25,
+    "INCREASE_PC": null,
+
+    "force": null,
+
+    "time_limit": "1h",
+    "DEBUG": true
+}
