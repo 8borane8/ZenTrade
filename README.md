@@ -13,4 +13,5 @@ ZenTrade is a Trading Bot who works on FTX
 
 ## Strategies
 
-The bot is based on ema
+* The bot is based on two EMA indicators
+* You can define a buy and sell price where the bot will buy or sell automatically
