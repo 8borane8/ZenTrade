@@ -65,14 +65,13 @@ def getPrice():
   except Exception as e:
     r1 = json.dumps(exchange.fetch_ticker(symbol))
     dataPrice = json.loads(r1)
-  
   return (dataPrice['last'])
 
-def getUsdtBalance():
+def getCoinBalance():
   for x in exchange.fetchBalance(params = {})["info"]["result"]:
-      if(x["coin"] == symbol.split("/")[0]):
-        amount = float(x["total"])
-        return amount
+    if(x["coin"] == symbol.split("/")[0]):
+      return float(x["total"])
+  return 0
 
 def getAmount(price, amount_config):
   if(amount_config != "max"):
@@ -81,21 +80,20 @@ def getAmount(price, amount_config):
   else:
     for x in exchange.fetchBalance(params = {})["info"]["result"]:
       if(x["coin"] == symbol.split("/")[1]):
-        amount = float(x["total"])/price
-        return amount
+        return float(x["total"])/price
+    return 0
 
 
 # Ema Vars
 ema_OpenTransaction = False
 ema_BuyPrice = 0
 ema_BuyAmount = 0
+ema_benef = 0
 
 # Auto Vars
 auto_OpenTransaction = False
 auto_BuyPrice = 0
 auto_BuyAmount = 0
-
-price = getPrice()
 
 while True:
     print(f"\n[{colorama.Fore.YELLOW}INFO{colorama.Fore.RESET}] [{colorama.Fore.BLUE}{datetime.datetime.now()}{colorama.Fore.RESET}] >> Looping")
@@ -123,10 +121,10 @@ while True:
         print(f"[{colorama.Fore.MAGENTA}TRADE{colorama.Fore.RESET}] [{colorama.Fore.BLUE}{datetime.datetime.now()}{colorama.Fore.RESET}] >> Close Auto Trade by increase percent with Price = {price} WITH Amount = {ema_BuyAmount}")
         auto_OpenTransaction = False
         if(not config["DEBUG"]):
-          if getUsdtBalance() > auto_BuyAmount:
+          if getCoinBalance() > auto_BuyAmount:
             exchange.create_order(symbol, order_type , "sell", auto_BuyAmount, price)
           else:
-            exchange.create_order(symbol, order_type , "sell", getUsdtBalance(), price)
+            exchange.create_order(symbol, order_type , "sell", getCoinBalance(), price)
 
 
     if config["ema"] != None:
@@ -140,17 +138,21 @@ while True:
       if ema_OpenTransaction and priceData.iloc[-2]['EMA1'] < priceData.iloc[-2]['EMA2']:
         print(f"[{colorama.Fore.MAGENTA}TRADE{colorama.Fore.RESET}] [{colorama.Fore.BLUE}{datetime.datetime.now()}{colorama.Fore.RESET}] >> Close Ema Trade with Price = {price} WITH Amount = {ema_BuyAmount}")
         ema_OpenTransaction = False
-        if(not config["DEBUG"]): exchange.create_order(symbol, order_type , "sell", getUsdtBalance(), price)
+        if(not config["DEBUG"]): exchange.create_order(symbol, order_type , "sell", getCoinBalance(), price)
       elif ema_OpenTransaction and config["ema"]["INCREASE_PC"] != None and ((price - ema_BuyPrice) / ema_BuyPrice) * 100 >= config["ema"]["INCREASE_PC"]:
         print(f"[{colorama.Fore.MAGENTA}TRADE{colorama.Fore.RESET}] [{colorama.Fore.BLUE}{datetime.datetime.now()}{colorama.Fore.RESET}] >> Close Ema Trade by increase percent with Price = {price} WITH Amount = {ema_BuyAmount}")
         ema_OpenTransaction = False
         if(not config["DEBUG"]):
-          if getUsdtBalance() > ema_BuyAmount:
+          if getCoinBalance() > ema_BuyAmount:
             exchange.create_order(symbol, order_type , "sell", ema_BuyAmount, price)
           else:
-            exchange.create_order(symbol, order_type , "sell", getUsdtBalance(), price)
+            exchange.create_order(symbol, order_type , "sell", getCoinBalance(), price)
 
-    time.sleep(10)
+    if ema_OpenTransaction:
+      ema_benef = float(ema_BuyAmount) * float(price) - float(ema_BuyAmount) * float(ema_BuyPrice)
+
+    print(f"[{colorama.Fore.YELLOW}INFO{colorama.Fore.RESET}] [{colorama.Fore.BLUE}{datetime.datetime.now()}{colorama.Fore.RESET}] >> Total benef: {round(ema_benef, 2)}")
+    time.sleep(60*5)
 
 '''
 

@@ -4,17 +4,19 @@
     "sub_account": "SUB_ACCOUNT_NAME",
     
     "symbol": "BTC/USDT",
-    "amount": "max",
 
-    "EMA1_window": 9,
-    "EMA2_window": 38,
-    "STOCH_RSI": 0.25,
-    "INCREASE_PC": 5,
+    "ema": {
+        "EMA1_window": 9,
+        "EMA2_window": 38,
+        "STOCH_RSI": 0.25,
+        "INCREASE_PC": 5,
+        "amount": "max"
+    },
 
     "force": {
-        "buy_price": 0.655,
-        "sell_price": 1.1,
-        "amout": 3,
+        "buy_price": 100,
+        "sell_price": 150,
+        "amout": 10,
         "increase_pc": 5
     },
 
